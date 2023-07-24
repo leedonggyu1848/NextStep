@@ -1,11 +1,10 @@
 package com.example.nextstepwithkotlin
 
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.lang.Exception
+import java.lang.IllegalArgumentException
 
 class CalculatorTest {
     var calculator: Calculator = Calculator()
