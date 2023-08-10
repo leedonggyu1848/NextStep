@@ -1,12 +1,16 @@
 package com.example.nextstepwithkotlin
 
+import com.example.nextstepwithkotlin.request.ServerRequestParser
+import com.example.nextstepwithkotlin.response.ServerDispatcher
 import org.apache.logging.log4j.kotlin.logger
 import java.io.DataOutputStream
 import java.io.IOException
 import java.net.Socket
 
 class RequestHandler(val connection: Socket): Thread() {
-    val log = logger()
+    private val log = logger()
+    private val parser = ServerRequestParser
+    private val dispatcher = ServerDispatcher
 
     override fun run(): Unit {
         log.debug { "New Client Connect! Connected IP: ${connection.inetAddress}, Port: ${connection.port}" }
@@ -14,12 +18,15 @@ class RequestHandler(val connection: Socket): Thread() {
         try {
             connection.getInputStream().use {input ->
             connection.getOutputStream().use { output ->
+                val request = parser.parse(input)
+                request.print()
                 val dos = DataOutputStream(output)
-                val body = "Hello World!".toByteArray()
-                response200Header(dos, body.size)
-                responseBody(dos, body)
+                dispatcher.dispatch(request).getResponse().let { dos.writeBytes(it) }
+                dos.flush()
             }}
         } catch (e: IOException) {
+            log.error { e.message }
+        } catch (e: Exception) {
             log.error { e.message }
         }
     }
