@@ -51,10 +51,6 @@ class ServerResponse {
         response.append("\r\n")
     }
 
-    fun withBytes(byte: ByteArray) {
-        builder.append(byte)
-    }
-
     fun addHeader(key: String, value: String) {
         headers[key] = value
     }
