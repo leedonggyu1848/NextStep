@@ -5,11 +5,10 @@ import java.io.InputStream
 object ServerRequestParser {
     fun parse(input: InputStream): ServerRequest {
         val request = ServerRequest()
-        input.bufferedReader().use {br ->
-            generateSequence { br.readLine() }
+        val br = input.bufferedReader()
+        generateSequence { br.readLine() }
                     .takeWhile { it.isNotEmpty() }
                     .forEach { request.appendContent(it) }
-        }
         return parseFirstLine(request)
     }
 
