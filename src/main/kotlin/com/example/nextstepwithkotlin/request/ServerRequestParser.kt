@@ -18,7 +18,7 @@ object ServerRequestParser {
         if (tokens.size != 3) {
             throw ParseError("invalid request line: $firstLine")
         }
-        tokens[0].also { request.method = it }
+        tokens[0].also { request.method = HttpMethod.valueOf(it) }
         tokens[1].also { request.url = it }
         tokens[2].also { request.httpVersion = it }
         return request
