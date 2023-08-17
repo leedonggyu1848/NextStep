@@ -4,11 +4,17 @@ import com.example.nextstepwithkotlin.request.ServerRequest
 import org.apache.logging.log4j.kotlin.logger
 import java.io.File
 
+/**
+ * 요청과 응답을 처리하는 클래스
+ */
 object ServerDispatcher {
     private val log = logger()
     private const val baseUrl = "src/main/webapp"
     private const val charset = "utf-8"
 
+    /**
+     * 요청에 대한 응답을 처리하는 메서드
+     */
     fun dispatch(request: ServerRequest): ServerResponse {
         val response = ServerResponse()
         val file = generatePathFromUrl(request.url)
