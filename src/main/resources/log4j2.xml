@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<configuration status="debug">
+<configuration>
 
     <Appenders>
         <!-- 콜솔 -->
@@ -10,7 +10,7 @@
     </Appenders>
 
     <loggers>
-        <root level="debug" additivity="true">
+        <root level="trace" additivity="true">
             <AppenderRef ref="console"/>
         </root>
     </loggers>
