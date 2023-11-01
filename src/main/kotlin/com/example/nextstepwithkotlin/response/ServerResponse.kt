@@ -42,7 +42,6 @@ class ServerResponse {
     fun appendContent(s: String) {
         log.trace("appendContent: $s")
         builder.append(s)
-        builder.append("\r\n")
     }
 
     private fun isValid(): Boolean {
@@ -61,30 +60,39 @@ class ServerResponse {
             log.warn{"Invalid response status: $status, httpVersion: $httpVersion, phrase: $phrase"}
             throw IllegalStateException("Invalid response")
         }
-        val response = StringBuilder()
-        assembleFirstLine(response)
-        assembleHeaders(response)
-        response.append(builder.toString())
-        return response.toString()
+        return StringBuilder()
+            .assembleFirstLine()
+            .assembleHeaders()
+            .assembleContents()
+            .toString()
     }
 
-    private fun assembleFirstLine(response: StringBuilder) {
-        response.append(httpVersion)
-        response.append(" ")
-        response.append(status)
-        response.append(" ")
-        response.append(phrase)
-        response.append("\r\n")
+    private fun StringBuilder.assembleFirstLine(): StringBuilder {
+        this.append(httpVersion)
+        this.append(" ")
+        this.append(status)
+        this.append(" ")
+        this.append(phrase)
+        this.append("\r\n")
+        return this
     }
 
-    private fun assembleHeaders(response: StringBuilder) {
+    private fun StringBuilder.assembleHeaders(): StringBuilder {
+        headers[CONTENT_LENGTH] = body.toByteArray().size.toString()
         headers.forEach { (key, value) ->
-            response.append(key)
-            response.append(": ")
-            response.append(value)
-            response.append("\r\n")
+            this.append(key)
+            this.append(": ")
+            this.append(value)
+            this.append("\r\n")
         }
-        response.append("\r\n")
+        this.append("\r\n")
+        return this
+    }
+
+    private fun StringBuilder.assembleContents(): StringBuilder {
+        this.append(builder.toString())
+        this.append("\r\n")
+        return this
     }
 
     /**

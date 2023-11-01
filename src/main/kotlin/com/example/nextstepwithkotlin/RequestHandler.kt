@@ -6,6 +6,7 @@ import org.apache.logging.log4j.kotlin.logger
 import java.io.DataOutputStream
 import java.io.IOException
 import java.net.Socket
+import kotlin.math.min
 
 class RequestHandler(val connection: Socket): Thread() {
     private val log = logger()
@@ -21,8 +22,17 @@ class RequestHandler(val connection: Socket): Thread() {
                 val request = parser.parse(input)
                 request.print()
                 val dos = DataOutputStream(output)
-                dispatcher.dispatch(request).getResponse().let { dos.writeBytes(it) }
-                dos.flush()
+                dispatcher.dispatch(request).getResponse()
+                    .let {
+                        log.trace("response: $it")
+                        val bytes = it.toByteArray()
+                        val chuckSize = 1024
+                        for (i in bytes.indices step chuckSize) {
+                            val length = min(chuckSize, bytes.size - i)
+                            dos.write(bytes, i, length)
+                            dos.flush()
+                        }
+                    }
             }}
         } catch (e: IOException) {
             log.error { e.message }
@@ -30,18 +40,4 @@ class RequestHandler(val connection: Socket): Thread() {
             log.error { e.message }
         }
     }
-
-    private fun response200Header(dos: DataOutputStream, lengthOfBodyContent: Int): Unit {
-        dos.writeBytes("HTTP/1.1 200 OK \r\n")
-        dos.writeBytes("Content-Type: text//html;charset=utf-8\r\n")
-        dos.writeBytes("Content-Length: ${lengthOfBodyContent}\r\n")
-        dos.writeBytes("\r\n")
-    }
-
-    private fun responseBody(dos: DataOutputStream, body: ByteArray): Unit {
-        dos.write(body, 0, body.size)
-        dos.writeBytes("\r\n")
-        dos.flush()
-    }
-
 }
